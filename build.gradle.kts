@@ -17,7 +17,13 @@ repositories {
 
 dependencies {
     implementation("com.microsoft.azure.functions:azure-functions-java-library:3.1.0")
-    testImplementation("org.jetbrains.kotlin:kotlin-test")
+    implementation("com.starkbank:sdk:2.19.0")
+    implementation("com.azure:azure-security-keyvault-secrets:4.8.7")
+    implementation("com.azure:azure-identity:1.14.0")
+
+    testImplementation("io.mockk:mockk:1.12.0")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.7.2")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.7.2")
 }
 
 tasks.test {
