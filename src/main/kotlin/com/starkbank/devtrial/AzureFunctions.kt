@@ -4,15 +4,14 @@ import com.microsoft.azure.functions.annotation.*
 import com.microsoft.azure.functions.*
 import java.util.Optional
 
-class Functions {
-
-    @FunctionName("HttpTriggerFunction")
+class AzureFunctions {
+    @FunctionName("InvoiceWebhook")
     fun httpHandler(
         @HttpTrigger(
-            name = "req",
+            name = "invoice-webhook",
+            route = "invoice-webhook",
             methods = [HttpMethod.GET, HttpMethod.POST],
-            authLevel = AuthorizationLevel.ANONYMOUS,
-            route = "test"
+            authLevel = AuthorizationLevel.ANONYMOUS
         ) request: HttpRequestMessage<Optional<String>>,
         context: ExecutionContext
     ): HttpResponseMessage {
