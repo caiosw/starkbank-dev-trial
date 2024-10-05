@@ -1,22 +1,29 @@
+import java.util.Properties
+
+val properties = Properties()
+file("local.properties").inputStream().use { properties.load(it) }
+
 plugins {
     kotlin("jvm") version "1.9.22"
-    id("com.microsoft.azure.azurefunctions") version "1.8.0"
+    id("com.microsoft.azure.azurefunctions") version "1.16.0"
 }
 
-group = "org.example"
-version = "1.0-SNAPSHOT"
+group = "com.starkbank.devtrial"
+version = "0.0.1"
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
+    implementation("com.microsoft.azure.functions:azure-functions-java-library:3.1.0")
     testImplementation("org.jetbrains.kotlin:kotlin-test")
 }
 
 tasks.test {
     useJUnitPlatform()
 }
+
 kotlin {
     jvmToolchain(11)
 }
@@ -25,29 +32,41 @@ java {
     sourceCompatibility = JavaVersion.VERSION_11
     targetCompatibility = JavaVersion.VERSION_11
 }
-
 tasks.withType<JavaCompile> {
     options.release.set(11)
+    options.encoding = "UTF-8"
+}
+
+sourceSets {
+    main {
+        java {
+            // this is needed, otherwise the :azureFunctionPackage will look for build/classes/java/main
+            destinationDirectory.set(File("build/classes/kotlin/main"))
+        }
+    }
 }
 
 azurefunctions {
-    subscription = "dev-starkbank-subscription"
+    subscription = properties.getProperty("AZURE_SUBSCRIPTION")
     resourceGroup = "dev-starkbank-rg"
-    appName = "dev-starkbank-azf"
+    appName = "dev-starkbank-devtrial-azf"
     pricingTier = "Consumption"
     region = "westus2"
+    allowTelemetry = false
+
     setRuntime(closureOf<com.microsoft.azure.gradle.configuration.GradleRuntimeConfig> {
         os("Linux")
+        javaVersion("Java 11")
     })
-    setAppSettings(closureOf<MutableMap<String, String>> {
-        put("key", "value")
-    })
+//    setAppSettings(closureOf<MutableMap<String, String>> {
+//        put("key", "value")
+//    })
     setAuth(closureOf<com.microsoft.azure.gradle.auth.GradleAuthConfig> {
         type = "azure_cli"
     })
-    // enable local debug
-    // localDebug = "transport=dt_socket,server=y,suspend=n,address=5005"
+    localDebug = "transport=dt_socket,server=y,suspend=n,address=5005"
     setDeployment(closureOf<com.microsoft.azure.plugin.functions.gradle.configuration.deploy.Deployment> {
+
         type = "run_from_blob"
     })
 }
