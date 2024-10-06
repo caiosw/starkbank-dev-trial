@@ -9,7 +9,7 @@ plugins {
 }
 
 group = "com.starkbank.devtrial"
-version = "0.0.1"
+version = "0.0.2"
 
 repositories {
     mavenCentral()
@@ -64,9 +64,10 @@ azurefunctions {
         os("Linux")
         javaVersion("Java 11")
     })
-//    setAppSettings(closureOf<MutableMap<String, String>> {
-//        put("key", "value")
-//    })
+    setAppSettings(closureOf<MutableMap<String, String>> {
+        put("SERVICE_BUS_CONN_STRING", "@Microsoft.KeyVault(VaultName=dev-starkbank-kv;SecretName=dev-starkbank-devtrial-sbq)")
+        put("STARK_BANK_API_SECRET_KEY", "@Microsoft.KeyVault(VaultName=dev-starkbank-kv;SecretName=dev-starkbank-api-private-key)")
+    })
     setAuth(closureOf<com.microsoft.azure.gradle.auth.GradleAuthConfig> {
         type = "azure_cli"
     })

@@ -6,21 +6,32 @@ import java.util.Optional
 
 class AzureFunctions {
     @FunctionName("InvoiceWebhook")
-    fun httpHandler(
+    fun invoiceWebhook(
         @HttpTrigger(
-            name = "invoice-webhook",
+            name = "InvoiceWebhook",
             route = "invoice-webhook",
             methods = [HttpMethod.GET, HttpMethod.POST],
             authLevel = AuthorizationLevel.ANONYMOUS
         ) request: HttpRequestMessage<Optional<String>>,
-        context: ExecutionContext
+        context: ExecutionContext,
+        @ServiceBusQueueOutput(
+            name = "ServiceBusOutputMessage",
+            queueName = "dev-starkbank-devtrial-sbq",
+            connection = "SERVICE_BUS_CONN_STRING"
+        ) output: OutputBinding<String>
     ): HttpResponseMessage {
-        val name = request.queryParameters["name"] ?: request.body.orElse("world")
+        val message = request.body.orElse("I received a webhook")
+        context.logger.info("Received message: $message")
 
-        val responseMessage = "Hello, $name"
+        // Process the message
+        val processedMessage = "Processed: $message"
 
-        context.logger.info("responseMessage: $responseMessage")
-        return request.createResponseBuilder(HttpStatus.OK).body(responseMessage).build()
+        // Send the processed message to Service Bus
+        output.value = processedMessage
+        context.logger.info("Message sent to Service Bus: $processedMessage")
+
+        // Return a 200 response for the webhook sender
+        return request.createResponseBuilder(HttpStatus.OK).body("Message sent to the queue").build()
     }
 
     @FunctionName("CronTriggerFunction")
