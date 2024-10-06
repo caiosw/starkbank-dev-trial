@@ -26,7 +26,7 @@ class InvoiceBuilderTest {
 
     @Test
     fun `(buildMany) should build a random quantity of invoices as expected`() {
-        val expectedQuantity = 1
+        val expectedQuantity = 3
 
         val mockedPersons = listOf(
             Person(taxId = "111.111.111-11", name = "Name 1"),
@@ -36,16 +36,14 @@ class InvoiceBuilderTest {
 
         val mockedAmounts = listOf(100L, 200L, 300L)
 
-        every { RandomData.getInvoiceQuantity() } returns expectedQuantity
         every { RandomData.getPerson() } returnsMany mockedPersons
         every { RandomData.getAmount() } returnsMany mockedAmounts
 
-        val actual = InvoiceBuilder.buildMany()
+        val actual = InvoiceBuilder.buildMany(expectedQuantity)
 
         assertEquals(expectedQuantity, actual.size)
 
         verifySequence {
-            RandomData.getInvoiceQuantity()
             RandomData.getPerson()
             RandomData.getAmount()
             RandomData.getPerson()
