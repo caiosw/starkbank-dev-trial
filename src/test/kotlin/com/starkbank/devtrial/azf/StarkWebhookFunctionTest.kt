@@ -1,92 +1,204 @@
 package com.starkbank.devtrial.azf
 
 import com.microsoft.azure.functions.*
+import com.starkbank.Event
+import com.starkbank.Settings
+import com.starkbank.devtrial.DefaultEntities.defaultWebhookMessageBody
+import com.starkbank.error.InvalidSignatureError
 import com.starkbank.utils.Parse
 import io.mockk.*
-import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.util.*
-import com.starkbank.devtrial.azf.StarkWebhookFunction
+import java.util.logging.Logger
 
 class StarkWebhookFunctionTest {
-    val mockedParse = mockk<Parse>()
+    private val defaultSignature = "signature"
+    private val defaultHeaders = mapOf("digital-signature" to defaultSignature)
+    private val defaultMessageBody = defaultWebhookMessageBody()
 
-    val webhookMessageBody = """
-        {
-          "event": {
-            "created": "2024-10-06T05:20:20.331385+00:00",
-            "id": "10",
-            "log": {
-              "created": "2024-10-06T05:20:14.070484+00:00",
-              "errors": [],
-              "id": "10",
-              "invoice": {
-                "amount": 431745,
-                "brcode": "brcode",
-                "created": "2024-10-06T05:10:16.614231+00:00",
-                "descriptions": [],
-                "discountAmount": 0,
-                "discounts": [],
-                "displayDescription": "description",
-                "due": "2024-10-08T05:10:16.596933+00:00",
-                "expiration": 5097600,
-                "fee": 0,
-                "fine": 2.0,
-                "fineAmount": 0,
-                "id": "10",
-                "interest": 1.0,
-                "interestAmount": 0,
-                "link": "https://link.to/invoice",
-                "name": "Sansa Stark",
-                "nominalAmount": 431745,
-                "pdf": "https://link.to/pdf.pdf",
-                "rules": [],
-                "splits": [],
-                "status": "paid",
-                "tags": [
-                  "tag1",
-                  "tag2"
-                ],
-                "taxId": "123.456.789-10",
-                "transactionIds": [],
-                "updated": "2024-10-06T05:20:14.070559+00:00"
-              },
-              "type": "paid"
-            },
-            "subscription": "invoice",
-            "workspaceId": "1"
-          }
-        }
-    """.trimIndent()
+    @BeforeEach
+    fun setUp() {
+        mockkStatic(Parse::class)
+    }
+
+    @AfterEach
+    fun tearDown() {
+        unmockkStatic(Parse::class)
+    }
 
     @Test
-    fun `(run) should receive a valid webhook from StarkBank as expected`() {
-        val mockRequest = mockk<HttpRequestMessage<Optional<String>>>()
-        val headers = mapOf(
-            "digital-signature" to "validDigitalSignature",
-            "some-other-header" to "someValue"
-        )
+    fun `(run) should send a valid webhook from StarkBank to the ServiceBus queue as expected`() {
+        val requestMock = mockk<HttpRequestMessage<Optional<String>>>()
+        val responseBuilderMock = mockk<HttpResponseMessage.Builder>()
+        val responseMock = mockk<HttpResponseMessage>()
+        val contextMock = mockk<ExecutionContext>()
+        val loggerMock = mockk<Logger>()
+        val outputMock = mockk<OutputBinding<String>>()
+
+        every { requestMock.body } returns Optional.of(defaultWebhookMessageBody())
+        every { requestMock.headers } returns defaultHeaders
+
+        every { Parse.verify<Event>(defaultMessageBody, defaultSignature, Settings.user) } returns ""
+
+        every { contextMock.logger } returns loggerMock
+        every { loggerMock.info("Digital-Signature verified.") } just Runs
+        every {
+            loggerMock.info("New webhook event sent to service bus queue: $defaultMessageBody")
+        } just Runs
+
+        every { requestMock.createResponseBuilder(HttpStatus.OK) } returns responseBuilderMock
+        every { responseBuilderMock.build() } returns responseMock
+
+        every { outputMock.setValue(defaultMessageBody) } just Runs
 
 
-        every { mockRequest.body } returns Optional.of(webhookMessageBody)
-        every { mockRequest.httpMethod } returns HttpMethod.POST
-        every { mockRequest.headers } returns headers
+        StarkWebhookFunction.run(requestMock, contextMock, outputMock)
 
-        // Mocking ExecutionContext
-        val mockContext = mockk<ExecutionContext>(relaxed = true)
-
-        // Mocking OutputBinding
-        val mockOutput = mockk<OutputBinding<String>>(relaxed = true)
-        val outputSlot = slot<String>()
-        every { mockOutput.setValue(capture(outputSlot)) } answers {}
-
-
-        StarkWebhookFunction.run(mockRequest, mockContext, mockOutput)
 
         verifySequence {
-            mockRequest.body
-            mockRequest.headers["digital-signature"]
+            requestMock.body
+            requestMock.headers
+            Parse.verify<Event>(defaultMessageBody, defaultSignature, Settings.user)
+            contextMock.logger
+            loggerMock.info("Digital-Signature verified.")
+            outputMock.setValue(defaultMessageBody)
+            contextMock.logger
+            loggerMock.info("New webhook event sent to service bus queue: $defaultMessageBody")
+            requestMock.createResponseBuilder(HttpStatus.OK)
+            responseBuilderMock.build()
         }
+    }
 
+    @Test
+    fun `(run) should respond a request without body with BAD_REQUEST error code`() {
+        val requestMock = mockk<HttpRequestMessage<Optional<String>>>()
+        val responseBuilderMock = mockk<HttpResponseMessage.Builder>()
+        val responseMock = mockk<HttpResponseMessage>()
+        val contextMock = mockk<ExecutionContext>()
+        val outputMock = mockk<OutputBinding<String>>()
+
+        every { requestMock.body } returns null
+
+        every { requestMock.createResponseBuilder(HttpStatus.BAD_REQUEST) } returns responseBuilderMock
+        every { responseBuilderMock.build() } returns responseMock
+
+        StarkWebhookFunction.run(requestMock, contextMock, outputMock)
+
+        verifySequence {
+            requestMock.body
+            requestMock.createResponseBuilder(HttpStatus.BAD_REQUEST)
+            responseBuilderMock.build()
+        }
+    }
+
+    @Test
+    fun `(run) should return UNAUTHORIZED error code if the digital-signature was not found`() {
+        val headers = mapOf("other-header" to "other value")
+
+        val requestMock = mockk<HttpRequestMessage<Optional<String>>>()
+        val responseBuilderMock = mockk<HttpResponseMessage.Builder>()
+        val responseMock = mockk<HttpResponseMessage>()
+        val contextMock = mockk<ExecutionContext>()
+        val loggerMock = mockk<Logger>()
+        val outputMock = mockk<OutputBinding<String>>()
+
+        every { requestMock.body } returns Optional.of(defaultMessageBody)
+        every { requestMock.headers } returns headers
+
+        every { contextMock.logger } returns loggerMock
+        every { loggerMock.severe("Signature not found. headers = $headers") } just Runs
+
+        every { requestMock.createResponseBuilder(HttpStatus.UNAUTHORIZED) } returns responseBuilderMock
+        every { responseBuilderMock.build() } returns responseMock
+
+        StarkWebhookFunction.run(requestMock, contextMock, outputMock)
+
+        verifySequence {
+            requestMock.body
+            requestMock.headers
+            contextMock.logger
+            requestMock.headers
+            loggerMock.severe("Signature not found. headers = $headers")
+            requestMock.createResponseBuilder(HttpStatus.UNAUTHORIZED)
+            responseBuilderMock.build()
+        }
+    }
+
+    @Test
+    fun `(run) should return a UNAUTHORIZED error code if the digital-signature is not validated`() {
+        val requestMock = mockk<HttpRequestMessage<Optional<String>>>()
+        val responseBuilderMock = mockk<HttpResponseMessage.Builder>()
+        val responseMock = mockk<HttpResponseMessage>()
+        val contextMock = mockk<ExecutionContext>()
+        val loggerMock = mockk<Logger>()
+        val outputMock = mockk<OutputBinding<String>>()
+
+        every { requestMock.body } returns Optional.of(defaultMessageBody)
+        every { requestMock.headers } returns defaultHeaders
+
+        every {
+            Parse.verify<Event>(defaultMessageBody, defaultSignature, Settings.user)
+        } throws InvalidSignatureError("")
+
+        every { contextMock.logger } returns loggerMock
+        every { loggerMock.severe("Error verifying Digital-signature.") } just Runs
+
+        every { requestMock.createResponseBuilder(HttpStatus.UNAUTHORIZED) } returns responseBuilderMock
+        every { responseBuilderMock.build() } returns responseMock
+
+
+        StarkWebhookFunction.run(requestMock, contextMock, outputMock)
+
+
+        verifySequence {
+            requestMock.body
+            requestMock.headers
+            Parse.verify<Event>(defaultMessageBody, defaultSignature, Settings.user)
+            contextMock.logger
+            loggerMock.severe("Error verifying Digital-signature.")
+            requestMock.createResponseBuilder(HttpStatus.UNAUTHORIZED)
+            responseBuilderMock.build()
+        }
+    }
+
+    @Test
+    fun `(run) should return a INTERNAL_SERVER_ERROR error when any other unexpected error happen`() {
+        val requestMock = mockk<HttpRequestMessage<Optional<String>>>()
+        val responseBuilderMock = mockk<HttpResponseMessage.Builder>()
+        val responseMock = mockk<HttpResponseMessage>()
+        val contextMock = mockk<ExecutionContext>()
+        val loggerMock = mockk<Logger>()
+        val outputMock = mockk<OutputBinding<String>>()
+
+        val exceptionMessageSlot = slot<String>()
+
+        every { requestMock.body } returns Optional.of(defaultMessageBody)
+        every { requestMock.headers } returns defaultHeaders
+
+        every { Parse.verify<Event>(defaultMessageBody, defaultSignature, Settings.user) } throws Exception("")
+
+        every { contextMock.logger } returns loggerMock
+        every { loggerMock.severe(capture(exceptionMessageSlot)) } just Runs
+
+        every { requestMock.createResponseBuilder(HttpStatus.INTERNAL_SERVER_ERROR) } returns responseBuilderMock
+        every { responseBuilderMock.build() } returns responseMock
+
+
+        StarkWebhookFunction.run(requestMock, contextMock, outputMock)
+
+
+        assert(exceptionMessageSlot.captured.contains("Error processing webhook:"))
+
+        verifySequence {
+            requestMock.body
+            requestMock.headers
+            Parse.verify<Event>(defaultMessageBody, defaultSignature, Settings.user)
+            contextMock.logger
+            loggerMock.severe(exceptionMessageSlot.captured)
+            requestMock.createResponseBuilder(HttpStatus.INTERNAL_SERVER_ERROR)
+            responseBuilderMock.build()
+        }
     }
 }

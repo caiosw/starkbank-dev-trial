@@ -13,7 +13,9 @@ object WebhookEventParser {
 
         val jsonObject = (Gson().fromJson(eventMessage, JsonObject::class.java) as JsonObject)
 
-        if (jsonObject["event"].isJsonNull) {
+
+
+        if (!jsonObject.has("event")) {
             throw InvalidJsonFormatException("Property 'event' not found in json message: $eventMessage")
         }
 

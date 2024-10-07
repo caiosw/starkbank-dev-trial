@@ -13,19 +13,16 @@ object StarkWebhookFunction {
         context: ExecutionContext,
         output: OutputBinding<String>
     ): HttpResponseMessage {
-        // TODO: Create tests for this function
-
         val content = request.body?.get()
-        val signature = request.headers["digital-signature"]
 
         if (content.isNullOrEmpty()) {
             return request.createResponseBuilder(HttpStatus.BAD_REQUEST).build()
-        } else {
-            context.logger.info("Message body found: $content")
         }
 
+        val signature = request.headers["digital-signature"]
+
         if (signature.isNullOrEmpty()) {
-            context.logger.severe("Signature not found. headers: ${request.headers}")
+            context.logger.severe("Signature not found. headers = ${request.headers}")
 
             return request.createResponseBuilder(HttpStatus.UNAUTHORIZED).build()
         }
@@ -35,7 +32,7 @@ object StarkWebhookFunction {
             context.logger.info("Digital-Signature verified.")
 
             output.value = content
-            context.logger.info("New webhook event sent to service bus queue: $output")
+            context.logger.info("New webhook event sent to service bus queue: $content")
 
             return request.createResponseBuilder(HttpStatus.OK).build()
         } catch (e: InvalidSignatureError) {
@@ -43,9 +40,9 @@ object StarkWebhookFunction {
 
             return request.createResponseBuilder(HttpStatus.UNAUTHORIZED).build()
         } catch (e: Exception) {
-            context.logger.severe("Error processing webhook: $e")
+            context.logger.severe("Error processing webhook: ${e.stackTrace}")
 
-            return request.createResponseBuilder(HttpStatus.UNAUTHORIZED).build()
+            return request.createResponseBuilder(HttpStatus.INTERNAL_SERVER_ERROR).build()
         }
     }
 }

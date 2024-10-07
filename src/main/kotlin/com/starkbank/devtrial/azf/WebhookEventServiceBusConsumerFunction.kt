@@ -61,7 +61,7 @@ object WebhookEventServiceBusConsumerFunction {
 //                .setDeadLetterErrorDescription(e.message)
 //            serviceBusReceiverClient.deadLetter(message, deadLetterOptions)
 
-            context.logger.severe("Exception found while processing event message: $e")
+            context.logger.severe("Exception found while processing event message: ${e.stackTrace}")
             throw e
         } catch (e: JsonSyntaxException) {
 //            val deadLetterOptions = DeadLetterOptions()
@@ -69,11 +69,11 @@ object WebhookEventServiceBusConsumerFunction {
 //                .setDeadLetterErrorDescription(e.message)
 //            serviceBusReceiverClient.deadLetter(message, deadLetterOptions)
 
-            context.logger.severe("Exception found while processing event message: $e")
+            context.logger.severe("Exception found while processing event message: ${e.stackTrace}")
             throw e
         } catch (e: Exception) {
-            context.logger.severe("Unknown exception found while processing event message: $e")
-            throw Exception("Unhandled exception: $e")
+            context.logger.severe("Unknown exception found while processing event message: ${e.stackTrace}")
+            throw Exception("Unhandled exception: ${e.stackTrace}")
         }
     }
 }

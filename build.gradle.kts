@@ -6,6 +6,11 @@ file("local.properties").inputStream().use { properties.load(it) }
 plugins {
     kotlin("jvm") version "1.9.22"
     id("com.microsoft.azure.azurefunctions") version "1.16.0"
+    id("jacoco")
+}
+
+jacoco {
+    toolVersion = "0.8.7"
 }
 
 group = "com.starkbank.devtrial"
@@ -26,8 +31,22 @@ dependencies {
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.7.2")
 }
 
+tasks.jacocoTestReport {
+    dependsOn(tasks.test) // tests are required to run before generating the report
+    reports {
+        xml.required = false
+        csv.required = false
+        html.outputLocation = layout.buildDirectory.dir("jacocoHtml")
+    }
+}
+
+
 tasks.test {
     useJUnitPlatform()
+    testLogging {
+        events("passed", "skipped", "failed")
+    }
+    finalizedBy(tasks.jacocoTestReport)
 }
 
 kotlin {

@@ -40,7 +40,6 @@ class AzureFunctions {
         ) message: String,
         context: ExecutionContext
     ) {
-        context.logger.warning("testing sending transfer!! (2)")
         WebhookEventServiceBusConsumerFunction.run(message, context)
     }
 
