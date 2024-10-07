@@ -44,6 +44,7 @@ class AzureFunctions {
     }
 
     @FunctionName("CronTriggerFunction")
+    @FixedDelayRetry(maxRetryCount = 10, delayInterval = "00:00:30")
     fun cronHandler(
         @TimerTrigger(name = "cronTrigger", schedule = "0 0 */3 * * *") timerInfo: String,
         context: ExecutionContext
