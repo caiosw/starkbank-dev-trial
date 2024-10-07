@@ -25,7 +25,7 @@ object StarkWebhookFunction {
         }
 
         if (signature.isNullOrEmpty()) {
-            context.logger.severe("Signature not found, headers: ${request.headers}")
+            context.logger.severe("Signature not found. headers: ${request.headers}")
 
             return request.createResponseBuilder(HttpStatus.UNAUTHORIZED).build()
         }
