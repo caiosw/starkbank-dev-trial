@@ -3,16 +3,6 @@ import java.util.Properties
 val properties = Properties()
 file("local.properties").inputStream().use { properties.load(it) }
 
-plugins {
-    kotlin("jvm") version "1.9.22"
-    id("com.microsoft.azure.azurefunctions") version "1.16.0"
-    id("jacoco")
-}
-
-jacoco {
-    toolVersion = "0.8.7"
-}
-
 group = "com.starkbank.devtrial"
 version = "0.0.2"
 
@@ -31,6 +21,28 @@ dependencies {
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.7.2")
 }
 
+plugins {
+    kotlin("jvm") version "1.9.22"
+    id("com.microsoft.azure.azurefunctions") version "1.16.0"
+    id("jacoco")
+    id("org.jlleitschuh.gradle.ktlint") version "10.2.0"
+}
+
+jacoco {
+    toolVersion = "0.8.7"
+}
+
+ktlint {
+    verbose.set(true)
+    outputToConsole.set(true)
+    coloredOutput.set(true)
+    additionalEditorconfigFile.set(file(".editorconfig"))
+    filter {
+        exclude("**/generated/**")
+        include("**/kotlin/**")
+    }
+}
+
 tasks.jacocoTestReport {
     dependsOn(tasks.test) // tests are required to run before generating the report
     reports {
@@ -39,7 +51,6 @@ tasks.jacocoTestReport {
         html.outputLocation = layout.buildDirectory.dir("jacocoHtml")
     }
 }
-
 
 tasks.test {
     useJUnitPlatform()
@@ -79,20 +90,31 @@ azurefunctions {
     region = "westus2"
     allowTelemetry = false
 
-    setRuntime(closureOf<com.microsoft.azure.gradle.configuration.GradleRuntimeConfig> {
-        os("Linux")
-        javaVersion("Java 11")
-    })
-    setAppSettings(closureOf<MutableMap<String, String>> {
-        put("SERVICE_BUS_CONN_STRING", "@Microsoft.KeyVault(VaultName=dev-starkbank-kv;SecretName=dev-starkbank-devtrial-sbq)")
-        put("STARK_BANK_API_SECRET_KEY", "@Microsoft.KeyVault(VaultName=dev-starkbank-kv;SecretName=dev-starkbank-api-private-key)")
-    })
-    setAuth(closureOf<com.microsoft.azure.gradle.auth.GradleAuthConfig> {
-        type = "azure_cli"
-    })
-    localDebug = "transport=dt_socket,server=y,suspend=n,address=5005"
-    setDeployment(closureOf<com.microsoft.azure.plugin.functions.gradle.configuration.deploy.Deployment> {
+    setRuntime(
+        closureOf<com.microsoft.azure.gradle.configuration.GradleRuntimeConfig> {
+            os("Linux")
+            javaVersion("Java 11")
+        }
+    )
 
-        type = "run_from_blob"
-    })
+    setAppSettings(
+        closureOf<MutableMap<String, String>> {
+            put("SERVICE_BUS_CONN_STRING", "@Microsoft.KeyVault(VaultName=dev-starkbank-kv;SecretName=dev-starkbank-devtrial-sbq)")
+            put("STARK_BANK_API_SECRET_KEY", "@Microsoft.KeyVault(VaultName=dev-starkbank-kv;SecretName=dev-starkbank-api-private-key)")
+        }
+    )
+
+    setAuth(
+        closureOf<com.microsoft.azure.gradle.auth.GradleAuthConfig> {
+            type = "azure_cli"
+        }
+    )
+
+    localDebug = "transport=dt_socket,server=y,suspend=n,address=5005"
+
+    setDeployment(
+        closureOf<com.microsoft.azure.plugin.functions.gradle.configuration.deploy.Deployment> {
+            type = "run_from_blob"
+        }
+    )
 }

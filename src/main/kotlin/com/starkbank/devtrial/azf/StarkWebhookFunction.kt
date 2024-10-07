@@ -1,11 +1,15 @@
 package com.starkbank.devtrial.azf
 
-import com.microsoft.azure.functions.*
+import com.microsoft.azure.functions.ExecutionContext
+import com.microsoft.azure.functions.HttpRequestMessage
+import com.microsoft.azure.functions.HttpResponseMessage
+import com.microsoft.azure.functions.HttpStatus
+import com.microsoft.azure.functions.OutputBinding
 import com.starkbank.Event
 import com.starkbank.Settings
 import com.starkbank.error.InvalidSignatureError
 import com.starkbank.utils.Parse
-import java.util.*
+import java.util.Optional
 
 object StarkWebhookFunction {
     fun run(

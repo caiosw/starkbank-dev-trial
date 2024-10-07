@@ -1,11 +1,21 @@
 package com.starkbank.devtrial
 
-import com.microsoft.azure.functions.*
-import com.microsoft.azure.functions.annotation.*
+import com.microsoft.azure.functions.ExecutionContext
+import com.microsoft.azure.functions.HttpMethod
+import com.microsoft.azure.functions.HttpRequestMessage
+import com.microsoft.azure.functions.HttpResponseMessage
+import com.microsoft.azure.functions.OutputBinding
+import com.microsoft.azure.functions.annotation.AuthorizationLevel
+import com.microsoft.azure.functions.annotation.Cardinality
+import com.microsoft.azure.functions.annotation.FixedDelayRetry
+import com.microsoft.azure.functions.annotation.FunctionName
+import com.microsoft.azure.functions.annotation.HttpTrigger
+import com.microsoft.azure.functions.annotation.ServiceBusQueueOutput
+import com.microsoft.azure.functions.annotation.ServiceBusQueueTrigger
+import com.microsoft.azure.functions.annotation.TimerTrigger
 import com.starkbank.devtrial.azf.StarkWebhookFunction
 import com.starkbank.devtrial.azf.WebhookEventServiceBusConsumerFunction
-import java.util.*
-
+import java.util.Optional
 
 class AzureFunctions {
     init {

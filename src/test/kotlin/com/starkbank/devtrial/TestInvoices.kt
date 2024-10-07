@@ -1,13 +1,11 @@
 package com.starkbank.devtrial
 
 import com.starkbank.Invoice
-import org.junit.jupiter.api.Test
 
-
-class TestX {
+class TestInvoices {
 
 //    @Test
-    fun Potato() {
+    fun createInvoices() {
         StarkBankAuthenticator.authenticate()
 
         val invoices = InvoiceBuilder.buildMany(3)
@@ -16,6 +14,4 @@ class TestX {
 
         x.forEach { println(it.toString()) }
     }
-
-
 }

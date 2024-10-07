@@ -1,16 +1,23 @@
 package com.starkbank.devtrial.azf
 
-import com.microsoft.azure.functions.*
+import com.microsoft.azure.functions.ExecutionContext
 import com.starkbank.Transfer
 import com.starkbank.devtrial.DefaultEntities.defaultInvoiceEvent
 import com.starkbank.devtrial.DefaultEntities.defaultWebhookMessageBody
 import com.starkbank.devtrial.createTransferToStarkBank
 import com.starkbank.devtrial.exceptions.EventTypeNotImplementedException
-import io.mockk.*
-import org.junit.jupiter.api.Test
+import io.mockk.Runs
+import io.mockk.every
+import io.mockk.just
+import io.mockk.mockk
+import io.mockk.mockkStatic
+import io.mockk.slot
+import io.mockk.unmockkStatic
+import io.mockk.verifySequence
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import java.util.logging.Logger
 

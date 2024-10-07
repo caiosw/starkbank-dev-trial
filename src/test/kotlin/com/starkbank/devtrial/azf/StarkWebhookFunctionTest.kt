@@ -1,16 +1,27 @@
 package com.starkbank.devtrial.azf
 
-import com.microsoft.azure.functions.*
+import com.microsoft.azure.functions.ExecutionContext
+import com.microsoft.azure.functions.HttpRequestMessage
+import com.microsoft.azure.functions.HttpResponseMessage
+import com.microsoft.azure.functions.HttpStatus
+import com.microsoft.azure.functions.OutputBinding
 import com.starkbank.Event
 import com.starkbank.Settings
 import com.starkbank.devtrial.DefaultEntities.defaultWebhookMessageBody
 import com.starkbank.error.InvalidSignatureError
 import com.starkbank.utils.Parse
-import io.mockk.*
+import io.mockk.Runs
+import io.mockk.every
+import io.mockk.just
+import io.mockk.mockk
+import io.mockk.mockkStatic
+import io.mockk.slot
+import io.mockk.unmockkStatic
+import io.mockk.verifySequence
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import java.util.*
+import java.util.Optional
 import java.util.logging.Logger
 
 class StarkWebhookFunctionTest {
@@ -53,9 +64,7 @@ class StarkWebhookFunctionTest {
 
         every { outputMock.setValue(defaultMessageBody) } just Runs
 
-
         StarkWebhookFunction.run(requestMock, contextMock, outputMock)
-
 
         verifySequence {
             requestMock.body
@@ -148,9 +157,7 @@ class StarkWebhookFunctionTest {
         every { requestMock.createResponseBuilder(HttpStatus.UNAUTHORIZED) } returns responseBuilderMock
         every { responseBuilderMock.build() } returns responseMock
 
-
         StarkWebhookFunction.run(requestMock, contextMock, outputMock)
-
 
         verifySequence {
             requestMock.body
@@ -185,9 +192,7 @@ class StarkWebhookFunctionTest {
         every { requestMock.createResponseBuilder(HttpStatus.INTERNAL_SERVER_ERROR) } returns responseBuilderMock
         every { responseBuilderMock.build() } returns responseMock
 
-
         StarkWebhookFunction.run(requestMock, contextMock, outputMock)
-
 
         assert(exceptionMessageSlot.captured.contains("Error processing webhook:"))
 
