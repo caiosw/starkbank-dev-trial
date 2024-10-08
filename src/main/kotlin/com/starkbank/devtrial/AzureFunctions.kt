@@ -30,7 +30,7 @@ class AzureFunctions {
             name = "StarkWebhook",
             route = "stark-webhook",
             methods = [HttpMethod.POST],
-            authLevel = AuthorizationLevel.ANONYMOUS
+            authLevel = AuthorizationLevel.FUNCTION
         ) request: HttpRequestMessage<Optional<String>>,
         context: ExecutionContext,
         @ServiceBusQueueOutput(
@@ -58,7 +58,7 @@ class AzureFunctions {
     @FunctionName("CreateInvoices")
     @FixedDelayRetry(maxRetryCount = 10, delayInterval = "00:00:30")
     fun createInvoices(
-        @TimerTrigger(name = "CreateInvoices", schedule = "0 */3 9 10 *") timerInfo: String,
+        @TimerTrigger(name = "CreateInvoices", schedule = "28 * * 10 *") timerInfo: String, // "0 */3 9 10 *"
         context: ExecutionContext
     ) {
         CreateInvoicesFunction.run(context)
