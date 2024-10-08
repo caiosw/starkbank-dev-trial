@@ -1,6 +1,7 @@
 package com.starkbank.devtrial
 
 import com.starkbank.Invoice
+import com.starkbank.devtrial.utils.InvoiceBuilder
 
 class TestInvoices {
 

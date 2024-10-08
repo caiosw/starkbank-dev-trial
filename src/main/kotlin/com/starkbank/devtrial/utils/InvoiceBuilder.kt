@@ -1,6 +1,7 @@
-package com.starkbank.devtrial
+package com.starkbank.devtrial.utils
 
 import com.starkbank.Invoice
+import com.starkbank.devtrial.Constants
 import com.starkbank.devtrial.models.InvoiceBasicRequest
 
 object InvoiceBuilder {

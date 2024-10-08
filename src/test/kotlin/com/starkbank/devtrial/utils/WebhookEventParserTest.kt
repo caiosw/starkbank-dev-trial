@@ -1,4 +1,4 @@
-package com.starkbank.devtrial
+package com.starkbank.devtrial.utils
 
 import com.starkbank.devtrial.DefaultEntities.defaultWebhookMessageBody
 import com.starkbank.devtrial.exceptions.InvalidJsonFormatException

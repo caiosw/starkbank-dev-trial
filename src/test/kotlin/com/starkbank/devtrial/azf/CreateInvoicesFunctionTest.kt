@@ -3,15 +3,14 @@ package com.starkbank.devtrial.azf
 import com.microsoft.azure.functions.ExecutionContext
 import com.starkbank.Invoice
 import com.starkbank.devtrial.DefaultEntities.defaultInvoiceBasicRequest
-import com.starkbank.devtrial.InvoiceBuilder
-import com.starkbank.devtrial.RandomData
+import com.starkbank.devtrial.utils.InvoiceBuilder
+import com.starkbank.devtrial.utils.RandomData
 import io.mockk.Runs
 import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
 import io.mockk.mockkObject
 import io.mockk.mockkStatic
-import io.mockk.slot
 import io.mockk.unmockkObject
 import io.mockk.unmockkStatic
 import io.mockk.verifySequence

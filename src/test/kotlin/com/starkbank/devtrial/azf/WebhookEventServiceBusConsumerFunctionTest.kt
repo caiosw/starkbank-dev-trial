@@ -4,7 +4,7 @@ import com.microsoft.azure.functions.ExecutionContext
 import com.starkbank.Transfer
 import com.starkbank.devtrial.DefaultEntities.defaultInvoiceEvent
 import com.starkbank.devtrial.DefaultEntities.defaultWebhookMessageBody
-import com.starkbank.devtrial.createTransferToStarkBank
+import com.starkbank.devtrial.utils.createTransferToStarkBank
 import com.starkbank.devtrial.exceptions.EventTypeNotImplementedException
 import io.mockk.Runs
 import io.mockk.every

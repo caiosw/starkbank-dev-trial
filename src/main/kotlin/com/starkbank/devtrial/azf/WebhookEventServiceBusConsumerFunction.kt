@@ -4,8 +4,8 @@ import com.google.gson.JsonSyntaxException
 import com.microsoft.azure.functions.ExecutionContext
 import com.starkbank.Event
 import com.starkbank.Transfer
-import com.starkbank.devtrial.WebhookEventParser
-import com.starkbank.devtrial.createTransferToStarkBank
+import com.starkbank.devtrial.utils.WebhookEventParser
+import com.starkbank.devtrial.utils.createTransferToStarkBank
 import com.starkbank.devtrial.exceptions.EventTypeNotFoundException
 import com.starkbank.devtrial.exceptions.EventTypeNotImplementedException
 import com.starkbank.devtrial.exceptions.StarkTrialException

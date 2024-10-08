@@ -1,7 +1,8 @@
-package com.starkbank.devtrial
+package com.starkbank.devtrial.utils
 
 import com.starkbank.Invoice
 import com.starkbank.Transfer
+import com.starkbank.devtrial.Constants
 
 fun Invoice.createTransferToStarkBank(): Transfer {
     val amount = this.amount.toLong() - this.fee.toLong()

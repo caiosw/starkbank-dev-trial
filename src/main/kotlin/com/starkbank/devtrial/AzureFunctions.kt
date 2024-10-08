@@ -17,6 +17,8 @@ import com.starkbank.Invoice
 import com.starkbank.devtrial.azf.CreateInvoicesFunction
 import com.starkbank.devtrial.azf.StarkWebhookFunction
 import com.starkbank.devtrial.azf.WebhookEventServiceBusConsumerFunction
+import com.starkbank.devtrial.utils.Timer
+import java.time.Clock
 import java.util.Optional
 
 class AzureFunctions {
@@ -58,9 +60,15 @@ class AzureFunctions {
     @FunctionName("CreateInvoices")
     @FixedDelayRetry(maxRetryCount = 10, delayInterval = "00:00:30")
     fun createInvoices(
-        @TimerTrigger(name = "CreateInvoices", schedule = "28 * * 10 *") timerInfo: String, // "0 */3 9 10 *"
+        @TimerTrigger(name = "CreateInvoices", schedule = "0 */3 8-9 10 *") timerInfo: String,
         context: ExecutionContext
     ) {
-        CreateInvoicesFunction.run(context)
+        val clock = Clock.systemUTC()
+
+        if (Timer.shouldRunCronJob(clock)) {
+            CreateInvoicesFunction.run(context)
+        } else {
+            context.logger.warning("Execution skipped.")
+        }
     }
 }

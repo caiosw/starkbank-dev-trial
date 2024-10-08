@@ -1,5 +1,6 @@
-package com.starkbank.devtrial
+package com.starkbank.devtrial.utils
 
+import com.starkbank.devtrial.Constants
 import org.junit.jupiter.api.Test
 
 class RandomDataGeneratorTest {

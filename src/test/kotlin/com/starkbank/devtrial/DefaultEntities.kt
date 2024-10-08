@@ -4,6 +4,7 @@ import com.starkbank.Event
 import com.starkbank.Invoice
 import com.starkbank.devtrial.models.InvoiceBasicRequest
 import com.starkbank.devtrial.models.Person
+import com.starkbank.devtrial.utils.WebhookEventParser
 
 object DefaultEntities {
     val defaultAmount = 1000L

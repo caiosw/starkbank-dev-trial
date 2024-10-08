@@ -1,4 +1,4 @@
-package com.starkbank.devtrial
+package com.starkbank.devtrial.utils
 
 import com.starkbank.devtrial.Constants.MAX_INVOICE_AMOUNT
 import com.starkbank.devtrial.Constants.MAX_INVOICE_QUANTITY

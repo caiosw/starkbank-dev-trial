@@ -2,8 +2,8 @@ package com.starkbank.devtrial.azf
 
 import com.microsoft.azure.functions.ExecutionContext
 import com.starkbank.Invoice
-import com.starkbank.devtrial.InvoiceBuilder
-import com.starkbank.devtrial.RandomData
+import com.starkbank.devtrial.utils.InvoiceBuilder
+import com.starkbank.devtrial.utils.RandomData
 
 object CreateInvoicesFunction {
     fun run(context: ExecutionContext) {

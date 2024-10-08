@@ -1,4 +1,4 @@
-package com.starkbank.devtrial
+package com.starkbank.devtrial.utils
 
 import com.google.gson.Gson
 import com.google.gson.JsonObject

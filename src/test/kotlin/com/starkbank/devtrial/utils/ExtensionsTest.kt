@@ -1,6 +1,7 @@
-package com.starkbank.devtrial
+package com.starkbank.devtrial.utils
 
 import com.starkbank.Transfer
+import com.starkbank.devtrial.Constants
 import com.starkbank.devtrial.DefaultEntities.defaultInvoiceEvent
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
