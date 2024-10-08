@@ -7,10 +7,16 @@ import com.starkbank.Settings
 
 object StarkBankAuthenticator {
     fun authenticate() {
+        val secretKey = if (System.getenv("IS_RUNNING_LOCALLY").toBoolean()) {
+            getPrivateKey()
+        } else {
+            System.getenv("STARK_BANK_API_SECRET_KEY")
+        }
+
         val user = Project(
             Constants.ENV,
             Constants.PROJECT_ID,
-            getPrivateKey()
+            secretKey
         )
 
         Settings.user = user

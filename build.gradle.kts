@@ -101,6 +101,7 @@ azurefunctions {
         closureOf<MutableMap<String, String>> {
             put("SERVICE_BUS_CONN_STRING", "@Microsoft.KeyVault(VaultName=dev-starkbank-kv;SecretName=dev-starkbank-devtrial-sbq)")
             put("STARK_BANK_API_SECRET_KEY", "@Microsoft.KeyVault(VaultName=dev-starkbank-kv;SecretName=dev-starkbank-api-private-key)")
+            put("IS_RUNNING_LOCALLY", "false")
         }
     )
 

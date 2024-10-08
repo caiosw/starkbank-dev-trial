@@ -1,1 +1,6 @@
-{ "Values": { "FUNCTIONS_WORKER_RUNTIME": "java" } }
+{
+  "Values": {
+    "FUNCTIONS_WORKER_RUNTIME": "java",
+    "IS_RUNNING_LOCALLY": true
+  }
+}

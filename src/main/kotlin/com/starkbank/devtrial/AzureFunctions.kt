@@ -13,6 +13,8 @@ import com.microsoft.azure.functions.annotation.HttpTrigger
 import com.microsoft.azure.functions.annotation.ServiceBusQueueOutput
 import com.microsoft.azure.functions.annotation.ServiceBusQueueTrigger
 import com.microsoft.azure.functions.annotation.TimerTrigger
+import com.starkbank.Invoice
+import com.starkbank.devtrial.azf.CreateInvoicesFunction
 import com.starkbank.devtrial.azf.StarkWebhookFunction
 import com.starkbank.devtrial.azf.WebhookEventServiceBusConsumerFunction
 import java.util.Optional
@@ -53,12 +55,12 @@ class AzureFunctions {
         WebhookEventServiceBusConsumerFunction.run(message, context)
     }
 
-    @FunctionName("CronTriggerFunction")
+    @FunctionName("CreateInvoices")
     @FixedDelayRetry(maxRetryCount = 10, delayInterval = "00:00:30")
-    fun cronHandler(
-        @TimerTrigger(name = "cronTrigger", schedule = "0 0 */3 * * *") timerInfo: String,
+    fun createInvoices(
+        @TimerTrigger(name = "CreateInvoices", schedule = "*/30 0 7 10 *") timerInfo: String, // "0 */3 8 10 *"
         context: ExecutionContext
     ) {
-        context.logger.info("Cron trigger fired at ${java.time.LocalDateTime.now()}")
+        CreateInvoicesFunction.run(context)
     }
 }
