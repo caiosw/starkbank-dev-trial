@@ -16,7 +16,7 @@ object StarkBankAuthenticator {
         val user = Project(
             Constants.ENV,
             Constants.PROJECT_ID,
-            secretKey
+            formatKey(secretKey)
         )
 
         Settings.user = user
@@ -32,13 +32,15 @@ object StarkBankAuthenticator {
             .credential(DefaultAzureCredentialBuilder().build())
             .buildClient()
 
-        val key = client.getSecret(secretName).value
+        return client.getSecret(secretName).value
+    }
 
+    private fun formatKey(key: String): String {
         val strBuilder = StringBuilder()
 
         key
             .split("\\n")
-            .forEach { strBuilder.appendLine(it) }
+            .forEach { strBuilder.appendLine(it) }.toString()
 
         return strBuilder.toString()
     }

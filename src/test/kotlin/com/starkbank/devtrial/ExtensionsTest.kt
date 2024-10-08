@@ -19,7 +19,7 @@ class ExtensionsTest {
         data["branchCode"] = "0001"
         data["accountNumber"] = "6341320293482496"
         data["accountType"] = "payment"
-        data["tags"] = Constants.TRANSFER_TAG_LIST.toTypedArray()
+        data["tags"] = (Constants.TRANSFER_TAG_LIST + listOf("invoiceId_10")).toTypedArray()
 
         val expected = Transfer(data)
 

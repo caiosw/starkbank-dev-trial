@@ -58,7 +58,7 @@ class AzureFunctions {
     @FunctionName("CreateInvoices")
     @FixedDelayRetry(maxRetryCount = 10, delayInterval = "00:00:30")
     fun createInvoices(
-        @TimerTrigger(name = "CreateInvoices", schedule = "*/30 0 7 10 *") timerInfo: String, // "0 */3 8 10 *"
+        @TimerTrigger(name = "CreateInvoices", schedule = "0 */3 9 10 *") timerInfo: String,
         context: ExecutionContext
     ) {
         CreateInvoicesFunction.run(context)
