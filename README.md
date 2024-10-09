@@ -10,7 +10,7 @@ This repository contains the code for the Stark Bank job interview dev trial.
 # Description
 
 For this challenge, I choose to get the opportunity of learning a new solution, Azure Function (AZF).
-This project is composed of 3 different AZFs:
+This project is composed of 3 different AZFs that were deployed and are running on the Azure cloud:
 ## CreateInvoices:
   ![image](https://github.com/user-attachments/assets/5b2954a5-9d6e-454f-b58f-de1874e5f2cd)
   
