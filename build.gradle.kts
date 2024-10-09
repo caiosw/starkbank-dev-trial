@@ -4,7 +4,7 @@ val properties = Properties()
 file("local.properties").inputStream().use { properties.load(it) }
 
 group = "com.starkbank.devtrial"
-version = "0.0.2"
+version = "1.0.0"
 
 repositories {
     mavenCentral()
