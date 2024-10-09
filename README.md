@@ -12,6 +12,7 @@ This repository contains the code for the Stark Bank job interview dev trial.
 For this challenge, I choose to get the opportunity of learning a new solution, Azure Function (AZF).
 This project is composed of 3 different AZFs:
 ## CreateInvoices:
+  ![image](https://github.com/user-attachments/assets/5b2954a5-9d6e-454f-b58f-de1874e5f2cd)
   
   It's an AZF of type TimerTrigger, it receives a crontab like command (e.g. 0 "*/3 8-9 10 *").
   
